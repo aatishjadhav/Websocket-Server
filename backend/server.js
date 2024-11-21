@@ -60,39 +60,34 @@ const targetData = {
   
   
   const updateData = (() => {
-    let elapsedTimeMs = 0;
-  
-    return () => {
-      elapsedTimeMs += updateIntervalMs;
-  
-      // Calculate the proportion of time elapsed
-      const elapsedProportion = elapsedTimeMs / (totalDurationHours * 60 * 60 * 1000);
-  
-      // Growth modifier based on elapsed time (sinusoidal growth for 1st and 4th days emphasis)
-      const growthModifier = Math.sin(elapsedProportion * Math.PI * 2) ** 2;
-  
-      // Calculate the increment for giftCardRedeem
-      const giftCardRedeemIncrement = incrementSteps.giftCardRedeem * growthModifier;
-  
-      // Calculate the increment for totalOrderLift based on giftCardRedeem increment (70-80% range)
-      const totalOrderLiftIncrement = giftCardRedeemIncrement * (Math.random() * 0.1 + 0.7);
-  
-      // Update all data values, ensuring specific fields remain integers
-      data = {
-        totalSales: Math.min(data.totalSales + incrementSteps.totalSales * growthModifier, targetData.totalSales), // Float
-        totalNoOfGiftCardSold: Math.floor(Math.min(data.totalNoOfGiftCardSold + incrementSteps.totalNoOfGiftCardSold * growthModifier, targetData.totalNoOfGiftCardSold)), // Integer
-        giftCardSold: Math.min(data.giftCardSold + incrementSteps.giftCardSold * growthModifier, targetData.giftCardSold), // Float
-        giftCardRedeem: Math.min(data.giftCardRedeem + giftCardRedeemIncrement, targetData.giftCardRedeem), // Float
-        totalOrderLift: Math.min(data.totalOrderLift + totalOrderLiftIncrement, targetData.totalOrderLift), // Float
-        loyaltySignup: Math.floor(Math.min(data.loyaltySignup + incrementSteps.loyaltySignup * growthModifier, targetData.loyaltySignup)), // Integer
-        loyaltyPointEarn: Math.floor(Math.min(data.loyaltyPointEarn + incrementSteps.loyaltyPointEarn * growthModifier, targetData.loyaltyPointEarn)), // Integer
-        loyaltyPointRedeem: Math.floor(Math.min(data.loyaltyPointRedeem + incrementSteps.loyaltyPointRedeem * growthModifier, targetData.loyaltyPointRedeem)), // Integer
-        orderPlacedUsingLoyaltyPoint: Math.floor(Math.min(data.orderPlacedUsingLoyaltyPoint + incrementSteps.orderPlacedUsingLoyaltyPoint * growthModifier, targetData.orderPlacedUsingLoyaltyPoint)), // Integer
-        orderPlacedUsingCashback: Math.min(data.orderPlacedUsingCashback + incrementSteps.orderPlacedUsingCashback * growthModifier, targetData.orderPlacedUsingCashback), // Float
-        orderPlacedUsingStoreCredit: Math.min(data.orderPlacedUsingStoreCredit + incrementSteps.orderPlacedUsingStoreCredit * growthModifier, targetData.orderPlacedUsingStoreCredit), // Float
-      };
+  let elapsedTimeMs = 0;
+  return () => {
+    elapsedTimeMs += updateIntervalMs;
+    // Calculate the proportion of time elapsed
+    const elapsedProportion = elapsedTimeMs / (totalDurationHours * 60 * 60 * 1000);
+    // Adjust growth with more emphasis in the initial phase
+    const growthModifier = Math.sin(elapsedProportion * Math.PI * 2) ** 2 * (1 - elapsedProportion / 2);
+    // Ensure `growthModifier` remains high in the initial phase
+    const initialBoost = elapsedProportion < 0.25 ? 1.5 : 1; // 1.5x boost in the first quarter
+    // Calculate increments with adjusted growth
+    const giftCardRedeemIncrement = incrementSteps.giftCardRedeem * growthModifier * initialBoost;
+    const totalOrderLiftIncrement = giftCardRedeemIncrement * (Math.random() * 0.1 + 0.7);
+    // Update all data values
+    data = {
+      totalSales: Math.min(data.totalSales + incrementSteps.totalSales * growthModifier * initialBoost, targetData.totalSales), // Float
+      totalNoOfGiftCardSold: Math.floor(Math.min(data.totalNoOfGiftCardSold + incrementSteps.totalNoOfGiftCardSold * growthModifier, targetData.totalNoOfGiftCardSold)), // Integer
+      giftCardSold: Math.min(data.giftCardSold + incrementSteps.giftCardSold * growthModifier, targetData.giftCardSold), // Float
+      giftCardRedeem: Math.min(data.giftCardRedeem + giftCardRedeemIncrement, targetData.giftCardRedeem), // Float
+      totalOrderLift: Math.min(data.totalOrderLift + totalOrderLiftIncrement, targetData.totalOrderLift), // Float
+      loyaltySignup: Math.floor(Math.min(data.loyaltySignup + incrementSteps.loyaltySignup * growthModifier, targetData.loyaltySignup)), // Integer
+      loyaltyPointEarn: Math.floor(Math.min(data.loyaltyPointEarn + incrementSteps.loyaltyPointEarn * growthModifier, targetData.loyaltyPointEarn)), // Integer
+      loyaltyPointRedeem: Math.floor(Math.min(data.loyaltyPointRedeem + incrementSteps.loyaltyPointRedeem * growthModifier, targetData.loyaltyPointRedeem)), // Integer
+      orderPlacedUsingLoyaltyPoint: Math.floor(Math.min(data.orderPlacedUsingLoyaltyPoint + incrementSteps.orderPlacedUsingLoyaltyPoint * growthModifier, targetData.orderPlacedUsingLoyaltyPoint)), // Integer
+      orderPlacedUsingCashback: Math.min(data.orderPlacedUsingCashback + incrementSteps.orderPlacedUsingCashback * growthModifier, targetData.orderPlacedUsingCashback), // Float
+      orderPlacedUsingStoreCredit: Math.min(data.orderPlacedUsingStoreCredit + incrementSteps.orderPlacedUsingStoreCredit * growthModifier, targetData.orderPlacedUsingStoreCredit), // Float
     };
-  })();
+  };
+})();
   
   
   // Start server
