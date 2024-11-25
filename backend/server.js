@@ -58,8 +58,7 @@ const updateData = (() => {
     elapsedTimeMs += updateIntervalMs;
 
     const elapsedProportion = elapsedTimeMs / (totalDurationHours * 60 * 60 * 1000);
-    const growthModifier = Math.sin(elapsedProportion * Math.PI * 2) ** 2;
-
+    const growthModifier = Math.sin(elapsedProportion * Math.PI / 2) ** 2;
     const giftCardRedeemIncrement = incrementSteps.giftCardRedeem * growthModifier;
     const totalOrderLiftIncrement = giftCardRedeemIncrement * (Math.random() * 0.1 + 0.7);
 
@@ -89,14 +88,18 @@ const wss = new WebSocketServer({ server });
 
 // Broadcast data to all connected clients
 const broadcastData = () => {
-  const jsonData = JSON.stringify(data);
-
-  wss.clients.forEach((client) => {
-    if (client.readyState === client.OPEN) {
-      client.send(jsonData);
-    }
-  });
+  try {
+    const jsonData = JSON.stringify(data);
+    wss.clients.forEach((client) => {
+      if (client.readyState === client.OPEN) {
+        client.send(jsonData);
+      }
+    });
+  } catch (error) {
+    console.error('Error broadcasting data:', error);
+  }
 };
+
 
 // Update and broadcast data periodically
 setInterval(() => {
