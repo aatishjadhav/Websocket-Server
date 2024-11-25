@@ -13,24 +13,24 @@ app.use(express.json());
 
 const targetData = {
   totalSales: 285817810, 
-  totalNoOfGiftCardSold: 4747267, 
-  giftCardSold: 4747267, 
-  giftCardRedeem: 270049, 
-  totalOrderLift: 270049, 
-  loyaltyPointEarn: 2045610, 
-  loyaltyPointRedeem: 700000, 
-  orderPlacedUsingLoyaltyPoint: 100000, 
+  totalNoOfGiftCardsSold: 4747267, 
+  giftCardsSold: 4747267, 
+  giftCardsRedeem: 270049, 
+  totalOrderValueLift: 270049, 
+  loyaltyPointsEarn: 2045610, 
+  loyaltyPointsRedeem: 700000, 
+  orderPlacedUsingLoyaltyPoints: 100000, 
 };
 
 let data = {
   totalSales: 0,
-  totalNoOfGiftCardSold: 0, 
-  giftCardSold: 0,
-  giftCardRedeem: 0,
-  totalOrderLift: 0,
-  loyaltyPointEarn: 0,
-  loyaltyPointRedeem: 0,
-  orderPlacedUsingLoyaltyPoint: 0,
+  totalNoOfGiftCardsSold: 0, 
+  giftCardsSold: 0,
+  giftCardsRedeem: 0,
+  totalOrderValueLift: 0,
+  loyaltyPointsEarn: 0,
+  loyaltyPointsRedeem: 0,
+  orderPlacedUsingLoyaltyPoints: 0,
   TotalOrdersPerMinute: 0, 
 };
 
@@ -40,13 +40,13 @@ const totalUpdates = (totalDurationHours * 60 * 60 * 1000) / updateIntervalMs;
 
 const incrementSteps = {
   totalSales: targetData.totalSales / totalUpdates,
-  totalNoOfGiftCardSold: targetData.totalNoOfGiftCardSold / totalUpdates, 
-  giftCardSold: targetData.giftCardSold / totalUpdates,
-  giftCardRedeem: targetData.giftCardRedeem / totalUpdates,
-  totalOrderLift: targetData.totalOrderLift / totalUpdates,
-  loyaltyPointEarn: targetData.loyaltyPointEarn / totalUpdates,
-  loyaltyPointRedeem: targetData.loyaltyPointRedeem / totalUpdates,
-  orderPlacedUsingLoyaltyPoint: targetData.orderPlacedUsingLoyaltyPoint / totalUpdates,
+  totalNoOfGiftCardsSold: targetData.totalNoOfGiftCardsSold / totalUpdates, 
+  giftCardsSold: targetData.giftCardsSold / totalUpdates,
+  giftCardsRedeem: targetData.giftCardsRedeem / totalUpdates,
+  totalOrderValueLift: targetData.totalOrderValueLift / totalUpdates,
+  loyaltyPointsEarn: targetData.loyaltyPointsEarn / totalUpdates,
+  loyaltyPointsRedeem: targetData.loyaltyPointsRedeem / totalUpdates,
+  orderPlacedUsingLoyaltyPoints: targetData.orderPlacedUsingLoyaltyPoints / totalUpdates,
 };
 
 let previousTotalOrderLift = 0; // To calculate orders per minute
@@ -59,22 +59,22 @@ const updateData = (() => {
 
     const elapsedProportion = elapsedTimeMs / (totalDurationHours * 60 * 60 * 1000);
     const growthModifier = Math.sin(elapsedProportion * Math.PI / 2) ** 2;
-    const giftCardRedeemIncrement = incrementSteps.giftCardRedeem * growthModifier;
-    const totalOrderLiftIncrement = giftCardRedeemIncrement * (Math.random() * 0.1 + 0.7);
+    const giftCardsRedeemIncrement = incrementSteps.giftCardsRedeem * growthModifier;
+    const totalOrderValueLiftIncrement = giftCardsRedeemIncrement * (Math.random() * 0.1 + 0.7);
 
     data = {
       totalSales: Math.min(data.totalSales + incrementSteps.totalSales * growthModifier, targetData.totalSales), // Float
-      totalNoOfGiftCardSold: Math.floor(Math.min(data.totalNoOfGiftCardSold + incrementSteps.totalNoOfGiftCardSold * growthModifier, targetData.totalNoOfGiftCardSold)), // Integer
-      giftCardSold: Math.min(data.giftCardSold + incrementSteps.giftCardSold * growthModifier, targetData.giftCardSold), // Float
-      giftCardRedeem: Math.min(data.giftCardRedeem + giftCardRedeemIncrement, targetData.giftCardRedeem), // Float
-      totalOrderLift: Math.min(data.totalOrderLift + totalOrderLiftIncrement, targetData.totalOrderLift), // Float
-      loyaltyPointEarn: Math.floor(Math.min(data.loyaltyPointEarn + incrementSteps.loyaltyPointEarn * growthModifier, targetData.loyaltyPointEarn)), // Integer
-      loyaltyPointRedeem: Math.floor(Math.min(data.loyaltyPointRedeem + incrementSteps.loyaltyPointRedeem * growthModifier, targetData.loyaltyPointRedeem)), // Integer
-      orderPlacedUsingLoyaltyPoint: Math.floor(Math.min(data.orderPlacedUsingLoyaltyPoint + incrementSteps.orderPlacedUsingLoyaltyPoint * growthModifier, targetData.orderPlacedUsingLoyaltyPoint)), // Integer
-      TotalOrdersPerMinute: Math.floor(((data.totalOrderLift - previousTotalOrderLift) / (updateIntervalMs / 60000))), // Calculate orders per minute
+      totalNoOfGiftCardsSold: Math.floor(Math.min(data.totalNoOfGiftCardsSold + incrementSteps.totalNoOfGiftCardsSold * growthModifier, targetData.totalNoOfGiftCardsSold)), // Integer
+      giftCardsSold: Math.min(data.giftCardsSold + incrementSteps.giftCardsSold * growthModifier, targetData.giftCardsSold), // Float
+      giftCardsRedeem: Math.min(data.giftCardsRedeem + giftCardsRedeemIncrement, targetData.giftCardsRedeem), // Float
+      totalOrderValueLift: Math.min(data.totalOrderValueLift + totalOrderValueLiftIncrement, targetData.totalOrderValueLift), // Float
+      loyaltyPointsEarn: Math.floor(Math.min(data.loyaltyPointsEarn + incrementSteps.loyaltyPointsEarn * growthModifier, targetData.loyaltyPointsEarn)), // Integer
+      loyaltyPointsRedeem: Math.floor(Math.min(data.loyaltyPointsRedeem + incrementSteps.loyaltyPointsRedeem * growthModifier, targetData.loyaltyPointsRedeem)), // Integer
+      orderPlacedUsingLoyaltyPoints: Math.floor(Math.min(data.orderPlacedUsingLoyaltyPoints + incrementSteps.orderPlacedUsingLoyaltyPoints * growthModifier, targetData.orderPlacedUsingLoyaltyPoints)), // Integer
+      TotalOrdersPerMinute: Math.floor(((data.totalOrderValueLift - previousTotalOrderLift) / (updateIntervalMs / 60000))), // Calculate orders per minute
     };
 
-    previousTotalOrderLift = data.totalOrderLift; // Update for the next interval
+    previousTotalOrderLift = data.totalOrderValueLift; // Update for the next interval
   };
 })();
 
