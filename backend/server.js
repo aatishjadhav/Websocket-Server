@@ -5,20 +5,19 @@ import { WebSocketServer } from 'ws';
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Target data and initial state
 const targetData = {
-  totalSales: 285817810,
-  totalNoOfGiftCardsSold: 79050986.8,
-  giftCardsSold: 1581019736,
-  giftCardsRedeem: 85745343,
-  totalOrderValueLift: 114327124,
-  loyaltyPointsEarn: 28581781,
-  loyaltyPointsRedeem: 42872671.5,
-  orderPlacedUsingLoyaltyPoints: 2858178.1
+  totalSales: 104005368,
+  totalNoOfGiftCardsSold: 105000,
+  giftCardsSold: 5200000,
+  giftCardsRedeem: 6050000,
+  totalOrderValueLift: 9000000,
+  loyaltyPointsEarn: 8000000,
+  loyaltyPointsRedeem: 29000000,
+  orderPlacedUsingLoyaltyPoints: 285818,
+  totalOrders: 3143996
 };
 
 let data = {
@@ -30,14 +29,15 @@ let data = {
   loyaltyPointsEarn: 0,
   loyaltyPointsRedeem: 0,
   orderPlacedUsingLoyaltyPoints: 0,
-  totalOrdersPerMinute: 0,
+  totalOrders: 0,
 };
 
-const updateIntervalMs = 10 * 1000;
+const updateIntervalMs = 60 * 1000;
 const totalDurationHours = 96;
-const totalUpdates = (totalDurationHours * 60 * 60 * 1000) / updateIntervalMs;
 
-// Increment steps
+const randomVariation = Math.floor(Math.random() * (10 - (-10) + 1)) + (-10); 
+const totalUpdates = (totalDurationHours * 60 * 60 * 1000) / updateIntervalMs + randomVariation; 
+
 const incrementSteps = {
   totalSales: targetData.totalSales / totalUpdates,
   totalNoOfGiftCardsSold: targetData.totalNoOfGiftCardsSold / totalUpdates,
@@ -47,26 +47,12 @@ const incrementSteps = {
   loyaltyPointsEarn: targetData.loyaltyPointsEarn / totalUpdates,
   loyaltyPointsRedeem: targetData.loyaltyPointsRedeem / totalUpdates,
   orderPlacedUsingLoyaltyPoints: targetData.orderPlacedUsingLoyaltyPoints / totalUpdates,
+  totalOrders: targetData.totalOrders / totalUpdates,
 };
 
-// Formatter for US locale
 const numberFormatter = new Intl.NumberFormat('en-US');
 
-// Update function
 const updateData = () => {
-  // Calculate Average Order Value (AOV)
-  const averageOrderValue = targetData.totalOrderValueLift / targetData.giftCardsSold;
-
-  // Estimate Total Orders based on updated sales value
-  const totalOrders = data.totalSales / averageOrderValue;
-
-  // Total time in minutes (96 hours)
-  const totalTimeMinutes = 96 * 60;  // 5760 minutes
-
-  // Calculate Orders Per Minute dynamically
-  const TotalOrdersPerMinute = totalOrders / totalTimeMinutes;
-
-  // Update the data object
   data = {
     totalSales: Math.min(data.totalSales + incrementSteps.totalSales, targetData.totalSales),
     totalNoOfGiftCardsSold: Math.min(data.totalNoOfGiftCardsSold + incrementSteps.totalNoOfGiftCardsSold, targetData.totalNoOfGiftCardsSold),
@@ -76,11 +62,10 @@ const updateData = () => {
     loyaltyPointsEarn: Math.min(data.loyaltyPointsEarn + incrementSteps.loyaltyPointsEarn, targetData.loyaltyPointsEarn),
     loyaltyPointsRedeem: Math.min(data.loyaltyPointsRedeem + incrementSteps.loyaltyPointsRedeem, targetData.loyaltyPointsRedeem),
     orderPlacedUsingLoyaltyPoints: Math.min(data.orderPlacedUsingLoyaltyPoints + incrementSteps.orderPlacedUsingLoyaltyPoints, targetData.orderPlacedUsingLoyaltyPoints),
-    totalOrdersPerMinute: TotalOrdersPerMinute, 
+    totalOrders: Math.min(data.totalOrders + incrementSteps.totalOrders, targetData.totalOrders), 
   };
 };
 
-// Format data for broadcast
 const formatData = (data) => {
   return {
     totalSales: numberFormatter.format(data.totalSales.toFixed(2)),
@@ -91,7 +76,7 @@ const formatData = (data) => {
     loyaltyPointsEarn: numberFormatter.format(data.loyaltyPointsEarn.toFixed(0)),
     loyaltyPointsRedeem: numberFormatter.format(data.loyaltyPointsRedeem.toFixed(0)),
     orderPlacedUsingLoyaltyPoints: numberFormatter.format(Math.round(data.orderPlacedUsingLoyaltyPoints)),
-    totalOrdersPerMinute: numberFormatter.format(Math.round(data.totalOrdersPerMinute)),
+    totalOrders: numberFormatter.format(Math.round(data.totalOrders)),
   };
 };
 
@@ -104,6 +89,7 @@ const wss = new WebSocketServer({ server });
 // Broadcast data to clients
 const broadcastData = () => {
   const formattedData = formatData(data);
+  
   const jsonData = JSON.stringify(formattedData);
   
   wss.clients.forEach((client) => {
@@ -114,7 +100,7 @@ const broadcastData = () => {
 };
 
 // Update and broadcast periodically
-updateData(); // Initial update
+updateData(); 
 setInterval(() => {
   updateData();
   broadcastData();
